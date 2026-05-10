@@ -18,20 +18,23 @@ const Dashboard = () => {
   const fetchImages = async () => {
     try {
       const response = await axiosInstance.get("/models");
-      setImages(response.data);
-      if (response.data.length > 0) {
-        setImage(response.data[0]);
+      const imagesArray = response.data.data || [];
+      setImages(imagesArray);
+      if (imagesArray.length > 0) {
+        setImage(imagesArray[0]);
       }
     } catch (error) {
       console.error("Failed to fetch images:", error);
+      setImages([]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleUpload = (newImage) => {
-    setImage(newImage);
-    setImages([newImage, ...images]);
+    const parsedImage = newImage?.data || newImage;
+    setImage(parsedImage);
+    setImages([parsedImage, ...images]);
   };
 
   const handleImageUpdate = (updatedImage) => {
@@ -52,6 +55,8 @@ const Dashboard = () => {
     }
   };
 
+  console.log("check all image",images);
+
   return (
     <div className="flex">
       <Sidebar />
@@ -66,9 +71,8 @@ const Dashboard = () => {
             <div className="flex-1">
               <Viewer image={image} />
 
-              {/* Image/Model List */}
               <div className="mt-4 grid grid-cols-6 gap-2">
-                {images.map((img) => (
+                {Array.isArray(images) && images.map((img) => (
                   <div
                     key={img._id}
                     onClick={() => setImage(img)}
@@ -78,13 +82,13 @@ const Dashboard = () => {
                         : "border-gray-700"
                     }`}
                   >
-                    {(img.type === "model" || img.fileUrl.endsWith(".glb")) ? (
+                    {(img.type === "model") ? (
                       <div className="w-full h-20 bg-gray-900 flex items-center justify-center text-xs text-gray-400">
                         3D Model
                       </div>
                     ) : (
                       <img
-                        src={`http://localhost:5000${img.fileUrl}`}
+                        src={img.fileUrl}
                         alt="thumbnail"
                         className="w-full h-20 object-cover"
                       />

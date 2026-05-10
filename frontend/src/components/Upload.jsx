@@ -24,7 +24,8 @@ const Upload = ({ onUpload }) => {
         },
       });
 
-      onUpload(response.data);
+      const uploadedModel = response.data?.data || response.data;
+      onUpload(uploadedModel);
       setFileName("");
       setLoading(false);
       e.target.value = "";

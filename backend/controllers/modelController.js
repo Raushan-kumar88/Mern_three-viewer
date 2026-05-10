@@ -3,13 +3,32 @@ import Model from "../models/Model.js";
 export const uploadModel = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+        status: 400
+      });
     }
 
-    const fileName = req.file.filename;
-    const fileUrl = `/uploads/${fileName}`; // Store accessible URL
+    let fileUrl = req.file.secure_url || req.file.path;
+
+    if (!fileUrl && req.file.filename) {
+      fileUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/${req.file.filename}`;
+    }
+
     const originalName = req.file.originalname.toLowerCase();
-    
+
+    if (!fileUrl) {
+      console.error("check url returned from Cloudinary:", req.file);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload file to Cloudinary",
+        status: 500
+      });
+    }
+
+    console.log("check here File uploaded successfully. URL:", fileUrl);
+
     // Detect file type
     let fileType = "image";
     if (originalName.endsWith(".glb") || originalName.endsWith(".gltf")) {
@@ -32,9 +51,19 @@ export const uploadModel = async (req, res) => {
       positionY: 0,
     });
 
-    res.json(model);
+    res.status(201).json({
+      success: true,
+      message: "Model uploaded successfully",
+      data: model,
+      status: 201
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Upload error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      status: 500
+    });
   }
 };
 
@@ -56,21 +85,43 @@ export const saveState = async (req, res) => {
     );
 
     if (!model) {
-      return res.status(404).json({ message: "Model not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Model not found",
+        status: 404
+      });
     }
 
-    res.json(model);
+    res.status(200).json({
+      success: true,
+      message: "Model state saved successfully",
+      data: model,
+      status: 200
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      status: 500
+    });
   }
 };
 
 export const getUserModels = async (req, res) => {
   try {
     const models = await Model.find({ user: req.user });
-    res.json(models);
+    res.status(200).json({
+      success: true,
+      message: "Models retrieved successfully",
+      data: models,
+      status: 200
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      status: 500
+    });
   }
 };
 
@@ -80,11 +131,23 @@ export const deleteModel = async (req, res) => {
     const model = await Model.findByIdAndDelete(modelId);
 
     if (!model) {
-      return res.status(404).json({ message: "Model not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Model not found",
+        status: 404
+      });
     }
 
-    res.json({ message: "Model deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Model deleted successfully",
+      status: 200
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      status: 500
+    });
   }
 };

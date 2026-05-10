@@ -7,6 +7,8 @@ const initialState = {
   user: userFromStorage || null,
   loading: false,
   error: null,
+  status: null,
+  success: false,
 };
 
 // REGISTER
@@ -14,9 +16,15 @@ export const register = createAsyncThunk(
   "auth/register",
   async (data, thunkAPI) => {
     try {
-      return await registerUser(data);
+      const response = await registerUser(data);
+      return response;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data.message);
+      const errorMessage = err.response?.data?.message || "Registration failed";
+      const statusCode = err.response?.status || 500;
+      return thunkAPI.rejectWithValue({
+        message: errorMessage,
+        status: statusCode
+      });
     }
   }
 );
@@ -26,9 +34,15 @@ export const login = createAsyncThunk(
   "auth/login",
   async (data, thunkAPI) => {
     try {
-      return await loginUser(data);
+      const response = await loginUser(data);
+      return response;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data.message);
+      const errorMessage = err.response?.data?.message || "Login failed";
+      const statusCode = err.response?.status || 500;
+      return thunkAPI.rejectWithValue({
+        message: errorMessage,
+        status: statusCode
+      });
     }
   }
 );
@@ -47,29 +61,45 @@ const authSlice = createSlice({
       // register
       .addCase(register.pending, (state) => {
         state.loading = true;
+        state.error = null;
+        state.status = null;
+        state.success = false;
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
-        localStorage.setItem("user", JSON.stringify(action.payload));
+        state.user = action.payload.data;
+        state.status = action.payload.status;
+        state.success = action.payload.success;
+        state.error = null;
+        localStorage.setItem("user", JSON.stringify(action.payload.data));
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload.message;
+        state.status = action.payload.status;
+        state.success = false;
       })
 
       // login
       .addCase(login.pending, (state) => {
         state.loading = true;
+        state.error = null;
+        state.status = null;
+        state.success = false;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
-        localStorage.setItem("user", JSON.stringify(action.payload));
+        state.user = action.payload.data;
+        state.status = action.payload.status;
+        state.success = action.payload.success;
+        state.error = null;
+        localStorage.setItem("user", JSON.stringify(action.payload.data));
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload.message;
+        state.status = action.payload.status;
+        state.success = false;
       });
   },
 });

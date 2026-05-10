@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
     const dispatch = useDispatch();
-    const { user, loading, error } = useSelector((state) => state.auth);
+    const { user, loading, error, status, success } = useSelector((state) => state.auth);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,9 +35,15 @@ const Login = () => {
                 <h2 className="mb-2 text-3xl font-bold text-white">Login</h2>
                 <p className="text-gray-400 mb-6 text-sm">Welcome back to your workspace</p>
 
-                {error && (
+                {success && status && (
+                    <div className="bg-green-900/30 border border-green-500 text-green-300 px-4 py-3 rounded mb-4 text-sm">
+                        ✅ Login successful! Status: <span className="text-green-400">{status}</span>
+                    </div>
+                )}
+
+                {error && status && (
                     <div className="bg-red-900/30 border border-red-500 text-red-300 px-4 py-3 rounded mb-4 text-sm">
-                        {error}
+                        ❌ {error} (Status: <span className="text-yellow-400">{status}</span>)
                     </div>
                 )}
 

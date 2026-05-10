@@ -87,7 +87,8 @@ const Viewer = ({ image }) => {
 
   // Get full URL for file
   const getFileUrl = (fileUrl) => {
-    if (fileUrl.startsWith("http")) {
+    console.log(fileUrl,"Raushan")
+    if (fileUrl.startsWith("https")) {
       return fileUrl;
     }
     if (fileUrl.startsWith("/")) {
@@ -97,7 +98,8 @@ const Viewer = ({ image }) => {
   };
 
   // 3D Model
-  if (image.type === "model" || image.fileUrl.endsWith(".glb") || image.fileUrl.endsWith(".gltf")) {
+  // if (image.type === "model" || image.fileUrl.endsWith(".glb") || image.fileUrl.endsWith(".gltf")) {
+  if (image.type === "model") {
     const modelUrl = getFileUrl(image.fileUrl);
 
     if (modelError) {

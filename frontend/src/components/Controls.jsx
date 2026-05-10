@@ -31,7 +31,8 @@ const Controls = ({ image, onImageUpdate }) => {
         zoom: image.zoom || 1,
       });
 
-      onImageUpdate(response.data);
+      const updatedModel = response.data?.data || response.data;
+      onImageUpdate(updatedModel);
       alert("State saved successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Save failed");

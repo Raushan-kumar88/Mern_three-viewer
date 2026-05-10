@@ -6,7 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, loading, error } = useSelector((state) => state.auth);
+  const { user, loading, error, status, success } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (user) {
@@ -51,9 +51,15 @@ const Signup = () => {
         <h2 className="mb-2 text-3xl font-bold text-white">Create Account</h2>
         <p className="text-gray-400 mb-6 text-sm">Join to start managing your assets</p>
 
-        {(error || localError) && (
+        {success && status && (
+          <div className="bg-green-900/30 border border-green-500 text-green-300 px-4 py-3 rounded mb-4 text-sm">
+            ✅ Account created successfully! Status: <span className="text-green-400">{status}</span>
+          </div>
+        )}
+
+        {(error || localError) && status && (
           <div className="bg-red-900/30 border border-red-500 text-red-300 px-4 py-3 rounded mb-4 text-sm">
-            {error || localError}
+            ❌ {error || localError} (Status: <span className="text-yellow-400">{status}</span>)
           </div>
         )}
 
