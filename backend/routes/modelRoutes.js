@@ -12,10 +12,7 @@ import {
 
 const router = express.Router();
 
-// Create a function to initialize Cloudinary storage
-// This will be called after dotenv.config() in index.js
 export const initializeCloudinaryStorage = () => {
-  // Configure Cloudinary with explicit credentials
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -63,7 +60,6 @@ export const initializeCloudinaryStorage = () => {
   return upload;
 };
 
-// Initialize upload middleware - will be set by index.js
 let upload;
 
 export const setupRoutes = (uploadMiddleware) => {
